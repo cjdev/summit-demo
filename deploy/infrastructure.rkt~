@@ -1,0 +1,20 @@
+#!/usr/bin/env racket
+#lang scripty #:dependencies '("base" "aws-cloudformation-template-lib")
+------------------------------------------------------------------------------------------------------
+#lang aws/cloudformation/template
+#:description "Deploy identity provider"
+
+;; ---------------------------------------------------------------------------------------------------
+;; params
+
+
+;; ---------------------------------------------------------------------------------------------------
+
+
+;; ---------------------------------------------------------------------------------------------------
+;; resources
+
+(defresource bucket
+  (aws:s3:bucket
+   #:website-configuration { #:index-document "index.html" }))
+
