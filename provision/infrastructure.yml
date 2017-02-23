@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Name:
+    Type: String
+    Default: summit-demo
+
+Resources:
+
+  Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      WebsiteConfiguration:
+        IndexDocument: index.html
+      BucketName: !Sub ${Name}.d.cjpowered.com
+
+  OriginAccessPolicy:
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket:
+        Ref: Bucket
+      PolicyDocument:
+        Statement:
+          - Action:
+              - "s3:GetObject"
+            Effect: "Allow"
+            Resource: !Sub arn:aws:s3:::${Bucket}/*
+            Principal: "*"
+
+  Domain:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      ResourceRecords:
+        - !GetAtt Bucket.DomainName
+      HostedZoneName: d.cjpowered.com.
+      TTL: "300"
+      Name: !Sub ${Name}.d.cjpowered.com.
+      Type: CNAME
+
+Outputs:
+  ContentStore:
+    Value: !Ref Bucket
+  Link:
+    Value: !Sub http://${Name}.d.cjpowered.com/index.html
+

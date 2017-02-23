@@ -13,11 +13,7 @@ op() {
     fi
 }
 
-tmp=$(mktemp)
-racket infrastructure.rkt > $tmp
-
 aws cloudformation $(op)-stack \
   --stack-name $stackname \
-  --template-body file://$tmp
+  --template-body file://infrastructure.yml
 
-rm $tmp
