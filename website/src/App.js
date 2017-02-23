@@ -25,7 +25,7 @@ class App extends Component {
     const token = hash.access_token;
     if (token) {
       this.setState({ loggedIn: true })
-      fetch('http://localhost:8080/greeting', {
+      fetch(`${API_URL}/greeting`, {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => res.json())
         .then(json => {
@@ -50,7 +50,7 @@ class App extends Component {
         <PageContent>
           {!this.state.loggedIn &&
             <Button type="solid-primary" onClick={() => {
-              window.location = `http://staging-io.cjpowered.com/auth?response_type=token&client_id=4znx2dxw7k519xkfmp4jv11cmq&redirect_uri=${encodeURIComponent('http://localhost:3000/')}`;
+              window.location = AUTH_URL;
             }}>
               Log In
             </Button>}
