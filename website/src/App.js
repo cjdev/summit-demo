@@ -1,4 +1,11 @@
 import React, { Component } from 'react';
+import '@cjdev/visual-stack/lib/global';
+
+
+import Layout from '@cjdev/visual-stack/lib/layouts/ApplicationLayout';
+import { PageHeader, PageTitle } from '@cjdev/visual-stack/lib/components/PageHeader';
+import { TopNav } from '@cjdev/visual-stack/lib/components/TopNav';
+import { SideNav, Link } from '@cjdev/visual-stack/lib/components/SideNav';
 
 const API_URL = process.env.REACT_APP_API_URL;
 const WEBSITE_URL = process.env.REACT_APP_WEBSITE_URL;
@@ -8,19 +15,32 @@ const AUTH_BASE_URL = 'http://staging-io.cjpowered.com';
 const AUTH_URL = `${AUTH_BASE_URL}/auth?response_type=token&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(WEBSITE_URL)}`;
 
 class App extends Component {
-  state = {};
+    state = {};
 
-  componentDidMount() {
-    fetch('http://localhost:8080/greeting')
-      .then(res => res.json())
-      .then(json => {
-        this.setState({ message: json.message })
-      });
-  }
+    componentDidMount() {
+        fetch('http://localhost:8080/greeting')
+            .then(res => res.json())
+            .then(json => {
+                this.setState({ message: json.message })
+            });
+    }
 
-  render() {
-    return <h1>{this.state.message}</h1>;
-  }
+    render() {
+        return (
+            <Layout
+                topNav={<TopNav appName="SUMMIT DEMO" />}
+                sideNav={
+                    <SideNav>
+                        <Link><a href="http://www.cj.com">CJ Home</a></Link>
+                    </SideNav>
+                }
+            >
+                <PageHeader>
+                    <PageTitle>{this.state.message}</PageTitle>
+                </PageHeader>
+            </Layout>
+        );
+    }
 }
 
 export default App;
