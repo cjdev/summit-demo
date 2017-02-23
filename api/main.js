@@ -7,7 +7,12 @@ app.use(require('cors')());
 app.use(require('express-jwt')({ secret: process.env.JWT_SECRET }))
 
 app.get('/greeting', (req, res) => {
-  res.json({ message: 'Hello, world!' });
+  fetch(`https://members.cj.com/affapi/oauth/user/${req.user.userId}/company`, {
+    headers: { Authorization: req.get('Authorization') }
+  }).then(res => res.json())
+    .then(body => {
+      res.json({ message: `Hello, world!`, companies: body });
+    });
 });
 
 app.use((err, req, res, next) => {

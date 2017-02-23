@@ -29,7 +29,7 @@ class App extends Component {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => res.json())
         .then(json => {
-          this.setState({ message: json.message })
+          this.setState(json)
         });
     }
   }
@@ -48,12 +48,18 @@ class App extends Component {
           <PageTitle>{this.state.message}</PageTitle>
         </PageHeader>
         <PageContent>
-          {!this.state.loggedIn &&
-            <Button type="solid-primary" onClick={() => {
-              window.location = AUTH_URL;
-            }}>
-              Log In
-            </Button>}
+          {(this.state.loggedIn && this.state.companies)
+            ? <div>
+                <h1>You are logged in.</h1>
+                <h2>You have {this.state.companies.length} companies:</h2>
+                <ul>{this.state.companies.map(({ id, name }) =>
+                  <li key={id}><b>{name}</b> ({'#'}{id})</li>)}</ul>
+              </div>
+            : <Button type="solid-primary" onClick={() => {
+                window.location = AUTH_URL;
+              }}>
+                Log In
+              </Button>}
         </PageContent>
       </Layout>
     );
