@@ -4,7 +4,8 @@ phases:
   pre_build:
     commands:
       - echo "pre build"
-      - chmod -R +x *.sh
+      - chmod +x ./deploy/*.sh || true
+      - chmod +x ./provision/*.sh || true
       - cd website && npm install
   build:
     commands:
