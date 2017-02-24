@@ -3,6 +3,19 @@ AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   Name:
     Type: String
+    MinLength: 1
+  GithubUser:
+    Type: String
+    NoEcho: true
+    MinLength: 1
+    Default: cjdev
+  GithubToken:
+    Type: String
+    NoEcho: true
+    MinLength: 1
+  GithubRepo:
+    Type: String
+    MinLength: 1
     Default: summit-demo
 
 Resources:
@@ -37,6 +50,126 @@ Resources:
       TTL: "300"
       Name: !Sub ${Name}.d.cjpowered.com.
       Type: CNAME
+
+  ArtifactStore:
+    Type: AWS::S3::Bucket
+
+  BuildRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ThePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                  - "s3:GetObject"
+                  - "s3:GetObjectVersion"
+                  - "s3:PutObject"
+                  - "cloudformation:*"
+                Resource: "*"
+
+  PipelineRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ThePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:*"
+                  - "cloudformation:*"
+                  - "ecs:*"
+                  - "iam:PassRole"
+                  - "ec2:*"
+                  - "elasticloadbalancing:*"
+                  - "autoscaling:*"
+                  - "cloudwatch:*"
+                  - "codebuild:*"
+                Resource: "*"
+
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      ArtifactStore:
+        Location: !Ref ArtifactStore
+        Type: S3
+      RoleArn: !GetAtt PipelineRole.Arn
+      RestartExecutionOnUpdate: false
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: Source
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Version: 1
+                Provider: GitHub
+              OutputArtifacts:
+                - Name: SummitDemo
+              Configuration:
+                Owner: !Ref GithubUser
+                Repo: !Ref GithubRepo
+                OAuthToken: !Ref GithubToken
+                Branch: api-infrastructure
+              RunOrder: 1
+        - Name: Build
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref Builder
+              InputArtifacts:
+                - Name: SummitDemo
+              OutputArtifacts:
+                - Name: SummitDemoDeployable
+              RunOrder: 1
+  Builder:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Location: !Ref ArtifactStore
+        Type: S3
+      Source:
+        Location: !Sub ${ArtifactStore}/source.zip
+        Type: S3
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/nodejs:7.0.0
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: AWS_DEFAULT_REGION
+            Value: !Ref AWS::Region
+          - Name: CI
+            Value: "true"
+          - Name: SUMMIT_STACK_NAME
+            Value: !Ref AWS::StackName
+      Name: !Ref AWS::StackName
+      ServiceRole: !Ref BuildRole
 
 Outputs:
   ContentStore:

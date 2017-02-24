@@ -1,6 +1,7 @@
 #!/bin/bash
 
-stackname="summer-demo"
+name=${1:-demo}
+stackname=summit-$name
 
 op() {
     local cmd=(aws)
@@ -15,5 +16,9 @@ op() {
 
 aws cloudformation $(op)-stack \
   --stack-name $stackname \
-  --template-body file://infrastructure.yml
+  --template-body file://$(dirname $0)/infrastructure.yml \
+  --capabilities CAPABILITY_IAM \
+  --parameters  \
+    "ParameterKey=GithubToken,ParameterValue=$SUMMIT_GITHUB_TOKEN" \
+    "ParameterKey=Name,ParameterValue=$name"
 
