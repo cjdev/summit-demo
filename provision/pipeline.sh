@@ -17,6 +17,6 @@ aws cloudformation $(op)-stack \
   --capabilities CAPABILITY_IAM \
   --stack-name $stackname \
   --template-body file://pipeline.yml \
-  --parameters "ParameterKey=GithubUser,ParameterValue=$SUMMIT_GITHUB_USER" \
-               "ParameterKey=GithubToken,ParameterValue=$SUMMIT_GITHUB_TOKEN"
+  --parameters  \
+         "ParameterKey=GithubToken,ParameterValue=$SUMMIT_GITHUB_TOKEN"
 

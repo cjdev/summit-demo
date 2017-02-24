@@ -3,12 +3,13 @@ Parameters:
   GithubUser:
     Type: String
     NoEcho: true
+    Default: cjdev
   GithubToken:
     Type: String
     NoEcho: true
   GithubRepo:
     Type: String
-    Default: git@github.com:cjdev/summit-demo.git
+    Default: summit-demo
 
 Resources:
 
@@ -65,6 +66,7 @@ Resources:
                   - "elasticloadbalancing:*"
                   - "autoscaling:*"
                   - "cloudwatch:*"
+                  - "codebuild:*"
                 Resource: "*"
 
 
@@ -91,7 +93,7 @@ Resources:
                 Owner: !Ref GithubUser
                 Repo: !Ref GithubRepo
                 OAuthToken: !Ref GithubToken
-                Branch: master
+                Branch: api-infrastructure
               RunOrder: 1
         - Name: Build
           Actions:
