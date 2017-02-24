@@ -1,0 +1,30 @@
+state = { loggedIn: false };
+
+componentDidMount() {
+  const hash = qs.parse(window.location.hash);
+  const token = hash.access_token;
+  if (token) {
+    this.setState({ loggedIn: true })
+    fetch(`${API_URL}/greeting`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(res => res.json())
+      .then(json => {
+        this.setState(json)
+      });
+  }
+}
+
+{(this.state.loggedIn && this.state.companies)
+  ? <div>
+      <h1>You are logged in.</h1>
+      <h2>You have {this.state.companies.length} companies:</h2>
+      <ul>{this.state.companies.map(({ id, name }) =>
+        <li key={id}><b>{name}</b> ({'#'}{id})</li>)}</ul>
+    </div>
+  : <Button type="solid-primary" onClick={() => {
+      window.location = AUTH_URL;
+    }}>
+      Log In
+    </Button>}
+
+app.use(require('express-jwt')({ secret: process.env.JWT_SECRET }))

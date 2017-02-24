@@ -1,0 +1,22 @@
+import '@cjdev/visual-stack/lib/global';
+
+import Layout from '@cjdev/visual-stack/lib/layouts/ApplicationLayout';
+import { PageHeader, PageTitle } from '@cjdev/visual-stack/lib/components/PageHeader';
+import { TopNav } from '@cjdev/visual-stack/lib/components/TopNav';
+import PageContent from '@cjdev/visual-stack/lib/components/PageContent';
+import { Button } from '@cjdev/visual-stack/lib/components/Button';
+import { SideNav, Link } from '@cjdev/visual-stack/lib/components/SideNav';
+
+<Layout
+  topNav={<TopNav appName="SUMMIT DEMO" />}
+  sideNav={
+    <SideNav>
+      <Link><a href="http://www.cj.com">CJ Home</a></Link>
+    </SideNav>
+  }
+>
+</Layout>
+
+<PageHeader>
+  <PageTitle>{this.state.message}</PageTitle>
+</PageHeader>

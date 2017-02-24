@@ -1,0 +1,14 @@
+{
+  "name": "summit-demo-api",
+  "version": "0.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.1",
+    "express": "^4.14.1",
+    "express-jwt": "^5.1.0",
+    "isomorphic-fetch": "^2.2.1"
+  }
+}
