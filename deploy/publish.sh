@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo -n 'Summit stack name:'
+echo $SUMMIT_STACK_NAME
 
 content-bucket() {
   aws cloudformation describe-stacks \
