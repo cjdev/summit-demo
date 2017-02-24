@@ -1,0 +1,20 @@
+version: 0.1
+
+phases:
+  pre_build:
+    commands:
+      - echo "pre build"
+      - chmod -R +x *.sh
+      - pushd website
+      - npm install
+      - popd
+  build:
+    commands:
+      - echo "build"
+      - pushd website
+      - npm run build
+      - popd
+  post_build:
+    commands:
+      - echo "post build"
+      - ./publish.sh
