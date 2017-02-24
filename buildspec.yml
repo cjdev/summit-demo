@@ -4,16 +4,19 @@ phases:
   pre_build:
     commands:
       - echo "pre build"
+      - env
+      - pwd
+      - ls -l
       - chmod -R +x *.sh
-      - pushd website
+      # - pushd website
       - npm install
-      - popd
+      # - popd
   build:
     commands:
       - echo "build"
-      - pushd website
+      # - pushd website
       - npm run build
-      - popd
+      # - popd
   post_build:
     commands:
       - echo "post build"
