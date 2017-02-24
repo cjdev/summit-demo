@@ -53,6 +53,7 @@ Resources:
 
   ArtifactStore:
     Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
 
   BuildRole:
     Type: "AWS::IAM::Role"
