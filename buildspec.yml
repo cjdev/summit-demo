@@ -11,6 +11,7 @@ phases:
     commands:
       - echo "build"
       - cd website && npm run build
+      - cd website && cat npm-debug.log
   post_build:
     commands:
       - echo "post build"
