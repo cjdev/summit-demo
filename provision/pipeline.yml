@@ -130,5 +130,8 @@ Resources:
             Value: !Ref AWS::Region
           - Name: CI
             Value: "true"
+          - Name: SUMMIT_STACK_NAME
+            Value: !Ref AWS::StackName
       Name: !Ref AWS::StackName
       ServiceRole: !Ref BuildRole
+
