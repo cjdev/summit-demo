@@ -5,15 +5,11 @@ phases:
     commands:
       - echo "pre build"
       - chmod -R +x *.sh
-      - cd website
-      - npm install
-      - cd ..
+      - cd website && npm install
   build:
     commands:
       - echo "build"
-      - cd website
-      - npm run build
-      - cd ..
+      - cd website && npm run build
   post_build:
     commands:
       - echo "post build"
