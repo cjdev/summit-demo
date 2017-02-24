@@ -1,0 +1,6 @@
+#!/bin/bash
+
+source $(dirname $0)/functions.shinc
+source $(dirname $0)/functions-demo-app.shinc
+
+update-stack $(demo-app-template-name) $(demo-app-stack-name $*) demo-app-params $*
