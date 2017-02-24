@@ -11,5 +11,5 @@ content-bucket() {
 aws s3 cp \
    --recursive \
    --cache-control 'max-age=31536000' \
-   $(dirname $0)/website/build/ \
+   $(dirname $0)/../website/build/ \
    "s3://$(content-bucket)/"
