@@ -1,6 +1,0 @@
-#!/bin/bash
-
-source $(dirname $0)/functions.shinc
-source $(dirname $0)/functions-demo-app.shinc
-
-describe-stack $(demo-app-stack-name $*)
