@@ -6,6 +6,13 @@
 name=${1:-demo}
 stackname=summit-$name
 
+stack-outputs() {
+  aws cloudformation describe-stacks \
+    --stack-name $1 \
+    --output text \
+    --query 'Stacks[0].Outputs | join(`"\n"`,[].join(`""`,[OutputKey,`"="`,OutputValue]))'
+}
+
 op() {
     local cmd=(aws)
     cmd+=(cloudformation describe-stacks --stack-name $stackname)
@@ -17,6 +24,10 @@ op() {
     fi
 }
 
+eval $(stack-outputs $stackname-network)
+eval $(stack-outputs $stackname-deployment-cluster)
+eval $(stack-outputs $stackname-security)
+
 aws cloudformation $(op)-stack \
   --stack-name $stackname \
   --template-body file://$(dirname $0)/infrastructure.yml \
@@ -24,4 +35,7 @@ aws cloudformation $(op)-stack \
   --parameters  \
     "ParameterKey=GithubToken,ParameterValue=$SUMMIT_GITHUB_TOKEN" \
     "ParameterKey=OAuthClientId,ParameterValue=$OAUTH_CLIENT_ID" \
+    "ParameterKey=NetworkServiceSubnets,ParameterValue=\"$NetworkServiceSubnets\"" \
+    "ParameterKey=LoadBalancerSecurityGroup,ParameterValue=$LoadBalancerSecurityGroup" \
+    "ParameterKey=Cluster,ParameterValue=$Cluster" \
     "ParameterKey=Name,ParameterValue=$name"

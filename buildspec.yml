@@ -1,19 +1,8 @@
 version: 0.1
 
 phases:
-  pre_build:
-    commands:
-      - echo "pre build"
-      - chmod +x ./deploy/*.sh || true
-      - chmod +x ./provision/*.sh || true
-      - cd website && npm install
   build:
     commands:
-      - echo "build frontend"
-      - cd website && npm run build
-      - echo "build backend"
-      - cd api && docker build -t 114272735376.dkr.ecr.us-east-1.amazonaws.com/summit-demo:${SUMMIT_STACK_NAME} && docker push 114272735376.dkr.ecr.us-east-1.amazonaws.com/summit-demo:${SUMMIT_STACK_NAME}
-  post_build:
-    commands:
-      - echo "post build"
-      - ./deploy/publish.sh
+      - chmod +x ./deploy/*.sh || true
+      - chmod +x ./provision/*.sh || true
+      - if [[ "$BUILD_ENV" = website ]]; then ./deploy/build-website.sh; else ./deploy/build-api.sh; fi
