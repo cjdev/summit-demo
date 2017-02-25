@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Parameters:
-  Name:
+  AppName:
     Type: String
     MinLength: 1
   GithubUser:
@@ -38,7 +38,7 @@ Resources:
     Properties:
       WebsiteConfiguration:
         IndexDocument: index.html
-      BucketName: !Sub ${Name}.d.cjpowered.com
+      BucketName: !Sub ${AppName}.d.cjpowered.com
 
   OriginAccessPolicy:
     Type: "AWS::S3::BucketPolicy"
@@ -60,7 +60,7 @@ Resources:
         - !GetAtt Bucket.DomainName
       HostedZoneName: d.cjpowered.com.
       TTL: "300"
-      Name: !Sub ${Name}.d.cjpowered.com.
+      Name: !Sub ${AppName}.d.cjpowered.com.
       Type: CNAME
 
   ArtifactStore:
@@ -199,7 +199,7 @@ Resources:
           - Name: CI
             Value: "true"
           - Name: SUMMIT_NAME
-            Value: !Ref Name
+            Value: !Ref AppName
           - Name: SUMMIT_STACK_NAME
             Value: !Ref AWS::StackName
       Name: !Sub ${AWS::StackName}-api
@@ -225,13 +225,13 @@ Resources:
           - Name: CI
             Value: "true"
           - Name: SUMMIT_NAME
-            Value: !Ref Name
+            Value: !Ref AppName
           - Name: SUMMIT_STACK_NAME
             Value: !Ref AWS::StackName
           - Name: REACT_APP_API_URL
-            Value: !Sub http://${Name}-api.d.cjpowered.com
+            Value: !Sub http://${AppName}-api.d.cjpowered.com
           - Name: REACT_APP_WEBSITE_URL
-            Value: !Sub http://${Name}.d.cjpowered.com/index.html
+            Value: !Sub http://${AppName}.d.cjpowered.com/index.html
           - Name: REACT_APP_CLIENT_ID
             Value: !Ref OAuthClientId
       Name: !Sub ${AWS::StackName}-website
@@ -244,7 +244,7 @@ Resources:
         DNSName: !GetAtt LoadBalancer.DNSName
         HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneNameID
       HostedZoneId: ZZCW5RQ81QPV3
-      Name: !Sub ${Name}-api.d.cjpowered.com.
+      Name: !Sub ${AppName}-api.d.cjpowered.com.
       Type: A
 
   LoadBalancer:
@@ -279,10 +279,10 @@ Resources:
   ServerTask:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: !Sub ${Name}-summit-demo-api
+      Family: !Sub ${AppName}-summit-demo-api
       ContainerDefinitions:
         - Name: demo-app
-          Image: !Sub 114272735376.dkr.ecr.us-east-1.amazonaws.com/summit-demo:${Name}
+          Image: !Sub 114272735376.dkr.ecr.us-east-1.amazonaws.com/summit-demo:${AppName}
           Memory: 128
           PortMappings:
             - ContainerPort: 8080
@@ -292,4 +292,6 @@ Outputs:
   ContentStore:
     Value: !Ref Bucket
   Link:
-    Value: !Sub http://${Name}.d.cjpowered.com/index.html
+    Value: !Sub http://${WebsiteDomain}/index.html
+
+

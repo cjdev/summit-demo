@@ -38,4 +38,4 @@ aws cloudformation $(op)-stack \
     "ParameterKey=NetworkServiceSubnets,ParameterValue=\"$NetworkServiceSubnets\"" \
     "ParameterKey=LoadBalancerSecurityGroup,ParameterValue=$LoadBalancerSecurityGroup" \
     "ParameterKey=Cluster,ParameterValue=$Cluster" \
-    "ParameterKey=Name,ParameterValue=$name"
+    "ParameterKey=AppName,ParameterValue=$name"
