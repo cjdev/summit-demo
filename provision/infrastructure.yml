@@ -17,6 +17,9 @@ Parameters:
     Type: String
     MinLength: 1
     Default: summit-demo
+  OAuthClientId:
+    Type: String
+    MinLength: 1
 
 Resources:
 
@@ -169,6 +172,12 @@ Resources:
             Value: "true"
           - Name: SUMMIT_STACK_NAME
             Value: !Ref AWS::StackName
+          - Name: REACT_APP_API_URL
+            Value: !Sub http://${Name}.d.cjpowered.com
+          - Name: REACT_APP_WEBSITE_URL
+            Value: !Sub http://${Name}.d.cjpowered.com/index.html
+          - Name: REACT_APP_CLIENT_ID
+            Value: !Ref OAuthClientId
       Name: !Ref AWS::StackName
       ServiceRole: !Ref BuildRole
 
@@ -177,4 +186,3 @@ Outputs:
     Value: !Ref Bucket
   Link:
     Value: !Sub http://${Name}.d.cjpowered.com/index.html
-

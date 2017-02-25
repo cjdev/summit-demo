@@ -1,5 +1,8 @@
 #!/bin/bash
 
+: ${SUMMIT_GITHUB_TOKEN:?}
+: ${OAUTH_CLIENT_ID:?}
+
 name=${1:-demo}
 stackname=summit-$name
 
@@ -20,5 +23,5 @@ aws cloudformation $(op)-stack \
   --capabilities CAPABILITY_IAM \
   --parameters  \
     "ParameterKey=GithubToken,ParameterValue=$SUMMIT_GITHUB_TOKEN" \
+    "ParameterKey=OAuthClientId,ParameterValue=$OAUTH_CLIENT_ID" \
     "ParameterKey=Name,ParameterValue=$name"
-
