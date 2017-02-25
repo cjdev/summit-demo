@@ -14,5 +14,4 @@ phases:
   post_build:
     commands:
       - echo "post build"
-      - cd website && cat npm-debug.log
-      # - ./deploy/publish.sh
+      - ./deploy/publish.sh
