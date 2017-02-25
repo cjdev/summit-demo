@@ -274,6 +274,7 @@ Resources:
       TaskDefinition: !Ref ServerTask
       DeploymentConfiguration:
         MinimumHealthyPercent: 0
+        MaximumPercent: 100
 
   ServerTask:
     Type: AWS::ECS::TaskDefinition
