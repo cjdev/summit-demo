@@ -5,4 +5,4 @@ phases:
     commands:
       - chmod +x ./deploy/*.sh || true
       - chmod +x ./provision/*.sh || true
-      - if [[ "$BUILD_ENV" = website ]]; then ./deploy/build-website.sh; else ./deploy/build-api.sh; fi
+      - if [ "$BUILD_ENV" = website ]; then ./deploy/build-website.sh; else ./deploy/build-api.sh; fi

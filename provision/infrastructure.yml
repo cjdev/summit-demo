@@ -91,6 +91,12 @@ Resources:
                   - "s3:GetObjectVersion"
                   - "s3:PutObject"
                   - "cloudformation:*"
+                  - "ecr:BatchCheckLayerAvailability"
+                  - "ecr:CompleteLayerUpload"
+                  - "ecr:GetAuthorizationToken"
+                  - "ecr:InitiateLayerUpload"
+                  - "ecr:PutImage"
+                  - "ecr:UploadLayerPart"
                 Resource: "*"
 
   PipelineRole:
@@ -186,6 +192,8 @@ Resources:
         Image: aws/codebuild/docker:1.12.1
         Type: LINUX_CONTAINER
         EnvironmentVariables:
+          - Name: BUILD_ENV
+            Value: api
           - Name: AWS_DEFAULT_REGION
             Value: !Ref AWS::Region
           - Name: CI
@@ -208,6 +216,8 @@ Resources:
         Image: aws/codebuild/nodejs:7.0.0
         Type: LINUX_CONTAINER
         EnvironmentVariables:
+          - Name: BUILD_ENV
+            Value: website
           - Name: AWS_DEFAULT_REGION
             Value: !Ref AWS::Region
           - Name: CI
