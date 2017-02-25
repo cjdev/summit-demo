@@ -1,2 +1,0 @@
-# Summit Demo
-
