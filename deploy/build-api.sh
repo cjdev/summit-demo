@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ex
 
-IMAGE_NAME=114272735376.dkr.ecr.us-east-1.amazonaws.com/summit-demo:"$SUMMIT_STACK_NAME"
+IMAGE_NAME=114272735376.dkr.ecr.us-east-1.amazonaws.com/summit-demo:"$SUMMIT_NAME"
 
 echo "prebuild"
 eval $(aws ecr get-login --region $AWS_DEFAULT_REGION)

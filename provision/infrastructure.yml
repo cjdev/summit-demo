@@ -198,6 +198,8 @@ Resources:
             Value: !Ref AWS::Region
           - Name: CI
             Value: "true"
+          - Name: SUMMIT_NAME
+            Value: !Ref Name
           - Name: SUMMIT_STACK_NAME
             Value: !Ref AWS::StackName
       Name: !Sub ${AWS::StackName}-api
@@ -222,10 +224,12 @@ Resources:
             Value: !Ref AWS::Region
           - Name: CI
             Value: "true"
+          - Name: SUMMIT_NAME
+            Value: !Ref Name
           - Name: SUMMIT_STACK_NAME
             Value: !Ref AWS::StackName
           - Name: REACT_APP_API_URL
-            Value: !Sub http://${Name}.d.cjpowered.com
+            Value: !Sub http://${Name}-api.d.cjpowered.com
           - Name: REACT_APP_WEBSITE_URL
             Value: !Sub http://${Name}.d.cjpowered.com/index.html
           - Name: REACT_APP_CLIENT_ID
@@ -233,55 +237,55 @@ Resources:
       Name: !Sub ${AWS::StackName}-website
       ServiceRole: !Ref BuildRole
 
-  # ApiDomain:
-  #   Type: AWS::Route53::RecordSet
-  #   Properties:
-  #     AliasTarget:
-  #       DNSName: !GetAtt LoadBalancer.DNSName
-  #       HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneNameID
-  #     HostedZoneId: ZZCW5RQ81QPV3
-  #     Name: !Sub ${Name}-api.d.cjpowered.com.
-  #     Type: A
-  #
-  # LoadBalancer:
-  #   Type: AWS::ElasticLoadBalancing::LoadBalancer
-  #   Properties:
-  #     CrossZone: true
-  #     Scheme: internet-facing
-  #     Listeners:
-  #       - InstancePort: 8080
-  #         InstanceProtocol: HTTP
-  #         LoadBalancerPort: 80
-  #         Protocol: HTTP
-  #     SecurityGroups:
-  #       - !Ref LoadBalancerSecurityGroup
-  #     Subnets: !Ref NetworkServiceSubnets
-  #
-  # Service:
-  #   Type: AWS::ECS::Service
-  #   Properties:
-  #     Cluster: !Ref Cluster
-  #     Role: "ecsServiceRole"
-  #     LoadBalancers:
-  #       - ContainerName: demo-app
-  #         ContainerPort: 8080
-  #         LoadBalancerName: !Ref LoadBalancer
-  #     DesiredCount: 1
-  #     TaskDefinition: !Ref ServerTask
-  #     DeploymentConfiguration:
-  #       MinimumHealthyPercent: 0
-  #
-  # ServerTask:
-  #   Type: AWS::ECS::TaskDefinition
-  #   Properties:
-  #     Family: !Sub ${Name}-summit-demo-api
-  #     ContainerDefinitions:
-  #       - Name: demo-app
-  #         Image: !Sub 114272735376.dkr.ecr.us-east-1.amazonaws.com/summit-demo:${Name}
-  #         Memory: 128
-  #         PortMappings:
-  #           - ContainerPort: 8080
-  #             HostPort: 8080
+  ApiDomain:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName: !GetAtt LoadBalancer.DNSName
+        HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneNameID
+      HostedZoneId: ZZCW5RQ81QPV3
+      Name: !Sub ${Name}-api.d.cjpowered.com.
+      Type: A
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      CrossZone: true
+      Scheme: internet-facing
+      Listeners:
+        - InstancePort: 8080
+          InstanceProtocol: HTTP
+          LoadBalancerPort: 80
+          Protocol: HTTP
+      SecurityGroups:
+        - !Ref LoadBalancerSecurityGroup
+      Subnets: !Ref NetworkServiceSubnets
+
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref Cluster
+      Role: "ecsServiceRole"
+      LoadBalancers:
+        - ContainerName: demo-app
+          ContainerPort: 8080
+          LoadBalancerName: !Ref LoadBalancer
+      DesiredCount: 1
+      TaskDefinition: !Ref ServerTask
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 0
+
+  ServerTask:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub ${Name}-summit-demo-api
+      ContainerDefinitions:
+        - Name: demo-app
+          Image: !Sub 114272735376.dkr.ecr.us-east-1.amazonaws.com/summit-demo:${Name}
+          Memory: 128
+          PortMappings:
+            - ContainerPort: 8080
+              HostPort: 8080
 
 Outputs:
   ContentStore:
