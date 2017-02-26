@@ -97,6 +97,7 @@ Resources:
                   - "ecr:InitiateLayerUpload"
                   - "ecr:PutImage"
                   - "ecr:UploadLayerPart"
+                  - "ecs:*"
                 Resource: "*"
 
   PipelineRole:
