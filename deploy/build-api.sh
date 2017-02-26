@@ -13,6 +13,7 @@ echo "post build"
 docker push "$IMAGE_NAME"
 
 # Bounce the service
+echo 'roll the service'
 service=$SUMMIT_ECS_SERVICE
 cluster=$SUMMIT_ECS_CLUSTER
 eval $(stack-outputs $SUMMIT_STACK_NAME)
