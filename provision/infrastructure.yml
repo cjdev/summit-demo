@@ -150,7 +150,7 @@ Resources:
                 Owner: !Ref GithubUser
                 Repo: !Ref GithubRepo
                 OAuthToken: !Ref GithubToken
-                Branch: master
+                Branch: auto-deploy
               RunOrder: 1
         - Name: Build
           Actions:
