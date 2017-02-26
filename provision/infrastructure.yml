@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Parameters:
-  Name:
+  AppName:
     Type: String
     MinLength: 1
   GithubUser:
@@ -17,6 +17,18 @@ Parameters:
     Type: String
     MinLength: 1
     Default: summit-demo
+  OAuthClientId:
+    Type: String
+    MinLength: 1
+  LoadBalancerSecurityGroup:
+    Type: String
+    MinLength: 1
+  NetworkServiceSubnets:
+    Type: List<String>
+    MinLength: 1
+  Cluster:
+    Type: String
+    MinLength: 1
 
 Resources:
 
@@ -26,7 +38,7 @@ Resources:
     Properties:
       WebsiteConfiguration:
         IndexDocument: index.html
-      BucketName: !Sub ${Name}.d.cjpowered.com
+      BucketName: !Sub ${AppName}.d.cjpowered.com
 
   OriginAccessPolicy:
     Type: "AWS::S3::BucketPolicy"
@@ -41,18 +53,19 @@ Resources:
             Resource: !Sub arn:aws:s3:::${Bucket}/*
             Principal: "*"
 
-  Domain:
+  WebsiteDomain:
     Type: AWS::Route53::RecordSet
     Properties:
       ResourceRecords:
         - !GetAtt Bucket.DomainName
       HostedZoneName: d.cjpowered.com.
       TTL: "300"
-      Name: !Sub ${Name}.d.cjpowered.com.
+      Name: !Sub ${AppName}.d.cjpowered.com.
       Type: CNAME
 
   ArtifactStore:
     Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
 
   BuildRole:
     Type: "AWS::IAM::Role"
@@ -78,6 +91,12 @@ Resources:
                   - "s3:GetObjectVersion"
                   - "s3:PutObject"
                   - "cloudformation:*"
+                  - "ecr:BatchCheckLayerAvailability"
+                  - "ecr:CompleteLayerUpload"
+                  - "ecr:GetAuthorizationToken"
+                  - "ecr:InitiateLayerUpload"
+                  - "ecr:PutImage"
+                  - "ecr:UploadLayerPart"
                 Resource: "*"
 
   PipelineRole:
@@ -131,24 +150,61 @@ Resources:
                 Owner: !Ref GithubUser
                 Repo: !Ref GithubRepo
                 OAuthToken: !Ref GithubToken
-                Branch: api-infrastructure
+                Branch: master
               RunOrder: 1
         - Name: Build
           Actions:
-            - Name: Build
+            - Name: Api
               ActionTypeId:
                 Category: Build
                 Owner: AWS
                 Version: 1
                 Provider: CodeBuild
               Configuration:
-                ProjectName: !Ref Builder
+                ProjectName: !Ref ApiBuilder
+              InputArtifacts:
+                - Name: SummitDemo
+              OutputArtifacts: []
+              RunOrder: 1
+            - Name: Website
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref WebsiteBuilder
               InputArtifacts:
                 - Name: SummitDemo
               OutputArtifacts:
                 - Name: SummitDemoDeployable
               RunOrder: 1
-  Builder:
+  ApiBuilder:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Source:
+        Location: !Sub ${ArtifactStore}/source.zip
+        Type: S3
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/docker:1.12.1
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: BUILD_ENV
+            Value: api
+          - Name: AWS_DEFAULT_REGION
+            Value: !Ref AWS::Region
+          - Name: CI
+            Value: "true"
+          - Name: SUMMIT_NAME
+            Value: !Ref AppName
+          - Name: SUMMIT_STACK_NAME
+            Value: !Ref AWS::StackName
+      Name: !Sub ${AWS::StackName}-api
+      ServiceRole: !Ref BuildRole
+  WebsiteBuilder:
     Type: AWS::CodeBuild::Project
     Properties:
       Artifacts:
@@ -162,18 +218,80 @@ Resources:
         Image: aws/codebuild/nodejs:7.0.0
         Type: LINUX_CONTAINER
         EnvironmentVariables:
+          - Name: BUILD_ENV
+            Value: website
           - Name: AWS_DEFAULT_REGION
             Value: !Ref AWS::Region
           - Name: CI
             Value: "true"
+          - Name: SUMMIT_NAME
+            Value: !Ref AppName
           - Name: SUMMIT_STACK_NAME
             Value: !Ref AWS::StackName
-      Name: !Ref AWS::StackName
+          - Name: REACT_APP_API_URL
+            Value: !Sub http://${AppName}-api.d.cjpowered.com
+          - Name: REACT_APP_WEBSITE_URL
+            Value: !Sub http://${AppName}.d.cjpowered.com/index.html
+          - Name: REACT_APP_CLIENT_ID
+            Value: !Ref OAuthClientId
+      Name: !Sub ${AWS::StackName}-website
       ServiceRole: !Ref BuildRole
+
+  ApiDomain:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName: !GetAtt LoadBalancer.DNSName
+        HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneNameID
+      HostedZoneId: ZZCW5RQ81QPV3
+      Name: !Sub ${AppName}-api.d.cjpowered.com.
+      Type: A
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      CrossZone: true
+      Scheme: internet-facing
+      Listeners:
+        - InstancePort: 8080
+          InstanceProtocol: HTTP
+          LoadBalancerPort: 80
+          Protocol: HTTP
+      SecurityGroups:
+        - !Ref LoadBalancerSecurityGroup
+      Subnets: !Ref NetworkServiceSubnets
+
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref Cluster
+      Role: "ecsServiceRole"
+      LoadBalancers:
+        - ContainerName: demo-app
+          ContainerPort: 8080
+          LoadBalancerName: !Ref LoadBalancer
+      DesiredCount: 1
+      TaskDefinition: !Ref ServerTask
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 0
+        MaximumPercent: 100
+
+  ServerTask:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub ${AppName}-summit-demo-api
+      ContainerDefinitions:
+        - Name: demo-app
+          Image: !Sub 114272735376.dkr.ecr.us-east-1.amazonaws.com/summit-demo:${AppName}
+          Memory: 128
+          PortMappings:
+            - ContainerPort: 8080
+              HostPort: 8080
 
 Outputs:
   ContentStore:
     Value: !Ref Bucket
   Link:
-    Value: !Sub http://${Name}.d.cjpowered.com/index.html
+    Value: !Sub http://${WebsiteDomain}/index.html
+
 

@@ -10,6 +10,11 @@ content-bucket() {
     --output text
 }
 
+while [ $(content-bucket) = "None" ]; do
+  echo 'Waiting for stack to settle...'
+  sleep 5
+done
+
 aws s3 cp \
    --recursive \
    --cache-control 'max-age=31536000' \

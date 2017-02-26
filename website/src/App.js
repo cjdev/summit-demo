@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Component } from 'react';
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -11,7 +12,7 @@ class App extends Component {
   state = {};
 
   componentDidMount() {
-    fetch('http://localhost:8080/greeting')
+    fetch(`${API_URL}/greeting`)
       .then(res => res.json())
       .then(json => {
         this.setState({ message: json.message })

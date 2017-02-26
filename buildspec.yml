@@ -1,17 +1,8 @@
 version: 0.1
 
 phases:
-  pre_build:
-    commands:
-      - echo "pre build"
-      - chmod +x ./deploy/*.sh || true
-      - chmod +x ./provision/*.sh || true
-      - cd website && npm install
   build:
     commands:
-      - echo "build"
-      - cd website && npm run build
-  post_build:
-    commands:
-      - echo "post build"
-      - ./deploy/publish.sh
+      - chmod +x ./deploy/*.sh || true
+      - chmod +x ./provision/*.sh || true
+      - if [ "$BUILD_ENV" = website ]; then ./deploy/build-website.sh; else ./deploy/build-api.sh; fi
