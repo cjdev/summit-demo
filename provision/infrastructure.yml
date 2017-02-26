@@ -151,7 +151,7 @@ Resources:
                 Owner: !Ref GithubUser
                 Repo: !Ref GithubRepo
                 OAuthToken: !Ref GithubToken
-                Branch: master
+                Branch: fix-circular-dep
               RunOrder: 1
         - Name: Build
           Actions:
@@ -207,8 +207,6 @@ Resources:
       ServiceRole: !Ref BuildRole
   WebsiteBuilder:
     Type: AWS::CodeBuild::Project
-    DependsOn:
-      - Bucket
     Properties:
       Artifacts:
         Location: !Ref ArtifactStore
@@ -237,8 +235,6 @@ Resources:
             Value: !Sub http://${AppName}.d.cjpowered.com/index.html
           - Name: REACT_APP_CLIENT_ID
             Value: !Ref OAuthClientId
-          - Name: SUMMIT_STATIC_BUCKET
-            Value: !Ref Bucket
       Name: !Sub ${AWS::StackName}-website
       ServiceRole: !Ref BuildRole
 
@@ -298,9 +294,5 @@ Outputs:
     Value: !Ref Bucket
   Link:
     Value: !Sub http://${WebsiteDomain}/index.html
-  Service:
-    Value: !Ref Service
-  Cluster:
-    Value: !Ref Cluster
 
 
