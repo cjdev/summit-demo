@@ -150,7 +150,7 @@ Resources:
                 Owner: !Ref GithubUser
                 Repo: !Ref GithubRepo
                 OAuthToken: !Ref GithubToken
-                Branch: api-infrastructure
+                Branch: master
               RunOrder: 1
         - Name: Build
           Actions:
