@@ -1,5 +1,10 @@
 #!/bin/bash
 
+secrets_file="$(dirname $0)/provision.penv"
+if [ -f "$secrets_file" ]; then
+  source "$secrets_file"
+fi
+
 : ${SUMMIT_GITHUB_TOKEN:?}
 : ${OAUTH_CLIENT_ID:?}
 
@@ -24,9 +29,9 @@ op() {
     fi
 }
 
-eval $(stack-outputs $stackname-network)
-eval $(stack-outputs $stackname-deployment-cluster)
-eval $(stack-outputs $stackname-security)
+eval $(stack-outputs summit-network)
+eval $(stack-outputs summit-deployment-cluster)
+eval $(stack-outputs summit-security)
 
 aws cloudformation $(op)-stack \
   --stack-name $stackname \
@@ -39,3 +44,6 @@ aws cloudformation $(op)-stack \
     "ParameterKey=LoadBalancerSecurityGroup,ParameterValue=$LoadBalancerSecurityGroup" \
     "ParameterKey=Cluster,ParameterValue=$Cluster" \
     "ParameterKey=AppName,ParameterValue=$name"
+
+url=http://${name}.d.cjpowered.com/index.html
+echo "Application URL: ${url}"
