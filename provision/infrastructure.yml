@@ -294,5 +294,8 @@ Outputs:
     Value: !Ref Bucket
   Link:
     Value: !Sub http://${WebsiteDomain}/index.html
-
+  Service:
+    Value: !Ref Service
+  Cluster:
+    Value: !Ref Cluster
 
