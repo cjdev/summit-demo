@@ -182,8 +182,6 @@ Resources:
               RunOrder: 1
   ApiBuilder:
     Type: AWS::CodeBuild::Project
-    DependsOn:
-      - Service
     Properties:
       Artifacts:
         Type: NO_ARTIFACTS
@@ -205,10 +203,6 @@ Resources:
             Value: !Ref AppName
           - Name: SUMMIT_STACK_NAME
             Value: !Ref AWS::StackName
-          - Name: SUMMIT_ECS_SERVICE
-            Value: !Ref Service
-          - Name: SUMMIT_ECS_CLUSTER
-            Value: !Ref Cluster
       Name: !Sub ${AWS::StackName}-api
       ServiceRole: !Ref BuildRole
   WebsiteBuilder:
