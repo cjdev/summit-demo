@@ -22,6 +22,6 @@ From the Lambda Architecture directory, launch these components, waiting for eac
 From the root of this project
 
 0. `./provision/provision.sh <audience-provided-name>`
-
+0. `./provision/watch <audience-provided-name>`
 
 
