@@ -1,13 +1,6 @@
 #!/bin/bash
 set -ex
 
-stack-outputs() {
-  aws cloudformation describe-stacks \
-    --stack-name $1 \
-    --output text \
-    --query 'Stacks[0].Outputs | join(`"\n"`,[].join(`""`,[OutputKey,`"="`,OutputValue]))'
-}
-
 IMAGE_NAME=114272735376.dkr.ecr.us-east-1.amazonaws.com/summit-demo:"$SUMMIT_NAME"
 
 echo "prebuild"
