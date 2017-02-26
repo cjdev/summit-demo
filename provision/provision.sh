@@ -44,6 +44,3 @@ aws cloudformation $(op)-stack \
     "ParameterKey=LoadBalancerSecurityGroup,ParameterValue=$LoadBalancerSecurityGroup" \
     "ParameterKey=Cluster,ParameterValue=$Cluster" \
     "ParameterKey=AppName,ParameterValue=$name"
-
-url=http://${name}.d.cjpowered.com/index.html
-echo "Application URL: ${url}"

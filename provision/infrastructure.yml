@@ -181,6 +181,8 @@ Resources:
               RunOrder: 1
   ApiBuilder:
     Type: AWS::CodeBuild::Project
+    DependsOn:
+      - Service
     Properties:
       Artifacts:
         Type: NO_ARTIFACTS
@@ -202,10 +204,16 @@ Resources:
             Value: !Ref AppName
           - Name: SUMMIT_STACK_NAME
             Value: !Ref AWS::StackName
+          - Name: SUMMIT_ECS_SERVICE
+            Value: !Ref Service
+          - Name: SUMMIT_ECS_CLUSTER
+            Value: !Ref Cluster
       Name: !Sub ${AWS::StackName}-api
       ServiceRole: !Ref BuildRole
   WebsiteBuilder:
     Type: AWS::CodeBuild::Project
+    DependsOn:
+      - Bucket
     Properties:
       Artifacts:
         Location: !Ref ArtifactStore
@@ -234,6 +242,8 @@ Resources:
             Value: !Sub http://${AppName}.d.cjpowered.com/index.html
           - Name: REACT_APP_CLIENT_ID
             Value: !Ref OAuthClientId
+          - Name: SUMMIT_STATIC_BUCKET
+            Value: !Ref Bucket
       Name: !Sub ${AWS::StackName}-website
       ServiceRole: !Ref BuildRole
 
@@ -293,5 +303,9 @@ Outputs:
     Value: !Ref Bucket
   Link:
     Value: !Sub http://${WebsiteDomain}/index.html
+  Service:
+    Value: !Ref Service
+  Cluster:
+    Value: !Ref Cluster
 
 
