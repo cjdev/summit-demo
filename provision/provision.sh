@@ -7,6 +7,7 @@ fi
 
 : ${SUMMIT_GITHUB_TOKEN:?}
 : ${OAUTH_CLIENT_ID:?}
+: ${JWT_SECRET:?}
 
 name=${1:-demo}
 stackname=summit-$name
@@ -40,6 +41,7 @@ aws cloudformation $(op)-stack \
   --parameters  \
     "ParameterKey=GithubToken,ParameterValue=$SUMMIT_GITHUB_TOKEN" \
     "ParameterKey=OAuthClientId,ParameterValue=$OAUTH_CLIENT_ID" \
+    "ParameterKey=JWTSecret,ParameterValue=$JWT_SECRET" \
     "ParameterKey=NetworkServiceSubnets,ParameterValue=\"$NetworkServiceSubnets\"" \
     "ParameterKey=LoadBalancerSecurityGroup,ParameterValue=$LoadBalancerSecurityGroup" \
     "ParameterKey=Cluster,ParameterValue=$Cluster" \
