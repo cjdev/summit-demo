@@ -9,6 +9,8 @@ import PageContent from '@cjdev/visual-stack/lib/components/PageContent';
 import { Button } from '@cjdev/visual-stack/lib/components/Button';
 import { SideNav, Link } from '@cjdev/visual-stack/lib/components/SideNav';
 
+import qs from 'query-string';
+
 const API_URL = process.env.REACT_APP_API_URL;
 const WEBSITE_URL = process.env.REACT_APP_WEBSITE_URL;
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
@@ -20,8 +22,12 @@ class App extends Component {
   state = {};
 
   componentDidMount() {
-    fetch(`${API_URL}/greeting`)
-      .then(res => res.json())
+    const hash = qs.parse(window.location.hash);
+    const token = hash.access_token;
+
+    fetch(`${API_URL}/greeting`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(res => res.json())
       .then(json => {
         this.setState({ message: json.message })
       });
@@ -37,10 +43,16 @@ class App extends Component {
           </SideNav>
         }
       >
-      <PageHeader>
-        <PageTitle>{this.state.message}</PageTitle>
-      </PageHeader>
-
+        <PageHeader>
+          <PageTitle>{this.state.message}</PageTitle>
+        </PageHeader>
+        <PageContent>
+          <Button type="solid-primary" onClick={() => {
+              window.location = AUTH_URL;
+            }}>
+            Log In
+          </Button>
+        </PageContent>
       </Layout>
     )
   }
