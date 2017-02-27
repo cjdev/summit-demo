@@ -29,6 +29,10 @@ Parameters:
   Cluster:
     Type: String
     MinLength: 1
+  JWTSecret:
+    Type: String
+    NoEcho: true
+    MinLength: 1
 
 Resources:
 
@@ -288,6 +292,10 @@ Resources:
           PortMappings:
             - ContainerPort: 8080
               HostPort: 8080
+          Environment:
+            - Name: JWT_SECRET
+              Value: !Ref JWTSecret
+
 
 Outputs:
   ContentStore:
@@ -298,4 +306,3 @@ Outputs:
     Value: !Ref Service
   Cluster:
     Value: !Ref Cluster
-
