@@ -25,12 +25,15 @@ class App extends Component {
     const hash = qs.parse(window.location.hash);
     const token = hash.access_token;
 
-    fetch(`${API_URL}/greeting`, {
-      headers: { Authorization: `Bearer ${token}` }
-    }).then(res => res.json())
-      .then(json => {
-        this.setState({ message: json.message })
-      });
+    if (token) {
+      this.setState({ loggedIn: true })
+      fetch(`${API_URL}/greeting`, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(res => res.json())
+        .then(json => {
+          this.setState(json)
+        });
+    }
   }
 
   render() {
@@ -47,11 +50,23 @@ class App extends Component {
           <PageTitle>{this.state.message}</PageTitle>
         </PageHeader>
         <PageContent>
-          <Button type="solid-primary" onClick={() => {
-              window.location = AUTH_URL;
-            }}>
-            Log In
-          </Button>
+          {this.state.loggedIn
+            ? <div>
+                <h1>You are logged in.</h1>
+                {this.state.companies
+                  ? <div>
+                      <h2>You have {this.state.companies.length} companies:</h2>
+                      <ul>{this.state.companies.map(({ id, name }) =>
+                        <li key={id}><b>{name}</b> ({'#'}{id})</li>)}
+                      </ul>
+                    </div>
+                  : <div>Loading companies.</div>}
+              </div>
+            : <Button type="solid-primary" onClick={() => {
+                window.location = AUTH_URL;
+              }}>
+              Log In
+            </Button>}
         </PageContent>
       </Layout>
     )
