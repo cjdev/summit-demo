@@ -1,3 +1,4 @@
+#!/bin/bash
 
 stackname="summit-${1:-demo}"
 watch -g \
