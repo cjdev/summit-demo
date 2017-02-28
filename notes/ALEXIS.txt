@@ -19,7 +19,8 @@ componentDidMount() {
       <h1>You are logged in.</h1>
       <h2>You have {this.state.companies.length} companies:</h2>
       <ul>{this.state.companies.map(({ id, name }) =>
-        <li key={id}><b>{name}</b> ({'#'}{id})</li>)}</ul>
+        <li key={id}><b>{name}</b> ({'#'}{id})</li>)}
+      </ul>
     </div>
   : <Button type="solid-primary" onClick={() => {
       window.location = AUTH_URL;
@@ -36,12 +37,4 @@ app.get('/greeting', (req, res) => {
     .then(body => {
       res.json({ message: `Hello, world!`, companies: body });
     });
-});
-
-app.use((err, req, res, next) => {
-  if (err.name === 'UnauthorizedError') {
-    res.status(401).json({ error: 'unauthorized' });
-  } else {
-    next(err);
-  }
 });
